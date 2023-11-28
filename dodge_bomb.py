@@ -26,6 +26,7 @@ def check_bound(rct):
         tate = False
     return yoko, tate
 
+
 def idou():
     """
     移動の合計値をsum_mvに返す。キー入力した方向にこうかとんの画像が切り替わる。
@@ -43,6 +44,7 @@ def idou():
     (-5, -5):pg.transform.rotozoom(kk_img0, -45, 1.0),
     (+5, +5):pg.transform.rotozoom(kk_img, -45, 1.0),
 }
+    
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -78,7 +80,7 @@ def main():
            c_acc += 1      
            
         selected_index = min(tmr // 500, 9)  # tmrに応じたリストの選択
-        bb_img = bb_imgs[selected_index]  # 選択された爆弾Surface  
+        bb_img = bb_imgs[selected_index]  # 追加機能3:選択された爆弾Surface  
         screen.blit(bb_img, bb_rct)
         
         for event in pg.event.get():
@@ -103,7 +105,18 @@ def main():
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         kk_img = kk_imgs[tuple(sum_mv)]
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)  # 練習２：爆弾を移動させる
+        
+        direction = pg.Vector2(kk_rct.center) - pg.Vector2(bb_rct.center) # 追加機能4:kk_rctとbb_rctの中心座標を比較し、爆弾をこうかとんに向かって移動させる
+        distance = direction.length()
+        if distance < 500:
+            direction.normalize_ip()
+            bb_rct.x += direction.x * 2 * c_acc  # 追加機能4:移動速度を調整
+            bb_rct.y += direction.y * 2 * c_acc
+        else:
+            direction.scale_to_length((distance-500) / 10)
+            bb_rct.x += direction.x
+            bb_rct.y += direction.y
+            
         
         sum_mv = [0, 0]
         
