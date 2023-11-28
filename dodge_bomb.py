@@ -43,10 +43,17 @@ def main():
     bb_rct = bb_img.get_rect()  #練習２：爆弾SurfaceのRentを抽出する
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
+    saccs = [a for a in range(1, 11)]  # 追加機能2:加速度のリスト
+    c_acc = 0  # 追加機能2:現在の加速度
     vx, vy = +5, +5  # 練習２：爆弾の速度
     clock = pg.time.Clock()
     tmr = 0
     while True:
+        if tmr % 100 == 0 and c_acc < len(saccs): # 追加機能2:爆弾を加速させる
+           acceleration = saccs[c_acc]
+           vx *= acceleration
+           vy *= acceleration
+           c_acc += 1          
         for event in pg.event.get():
             if event.type == pg.QUIT:  #×ボタンを押すと..
                 return
@@ -86,7 +93,6 @@ def main():
             vx *= -1
         if not tate:  # 縦方向にはみ出たら
             vy *= -1
-        bb_rct.move_ip(vx, vy)     
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
