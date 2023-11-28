@@ -33,7 +33,8 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("ex02/fig/pg_bg.jpg")
     kk_img = pg.image.load("ex02/fig/3.png")
-    kk_img = pg.transform.rotozoom(kk_img, 0, 2.0)
+    kk_img_right = pg.transform.rotozoom(kk_img, 0, 1.0)  #追加機能1：飛ぶ方向に従ってこうかとん画像を切り替える(右の画像に)
+    kk_img_left = pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 0, 1.0)  #追加機能1：飛ぶ方向に従ってこうかとん画像を切り替える(左の画像に)
     kk_rct = kk_img.get_rect()  # 練習３：こうかとんSurfaceのRectを抽出する
     kk_rct.center = 900, 400  # 練習３：こうかとんの初期座標
     bb_img = pg.Surface((20, 20))   #練習１:透明のSurfaceを作る
@@ -61,20 +62,32 @@ def main():
             if key_lst[k]:  # キーが押されたら
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
-
+                
         screen.blit(bg_img, [0, 0])
-        screen.blit(bb_img, bb_rct)
         kk_rct.move_ip(sum_mv[0], sum_mv[1])
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
-        screen.blit(kk_img, kk_rct)  # 練習３：こうかとんを移動させる
         bb_rct.move_ip(vx, vy)  # 練習２：爆弾を移動させる
+        
+        sum_mv = [0, 0]
+        for k, tpl in delta.items():
+            if key_lst[k]:  
+                sum_mv[0] += tpl[0]
+                sum_mv[1] += tpl[1]
+                
+        if sum_mv[0] < 0:  
+           screen.blit(kk_img_right, kk_rct) #追加機能1：飛ぶ方向に従ってこうかとん画像を切り替える(右の画像に)
+        elif sum_mv[0] > 0:  
+           screen.blit(kk_img_left, kk_rct) #追加機能1：飛ぶ方向に従ってこうかとん画像を切り替える(左の画像に)
+        else:
+            screen.blit(kk_img, kk_rct)   #追加機能1：移動が終わると右を向いたこうかとん画像に
+            
         yoko, tate = check_bound(bb_rct)
         if not yoko:  # 横方向にはみ出たら
             vx *= -1
         if not tate:  # 縦方向にはみ出たら
             vy *= -1
-        screen.blit(bb_img, bb_rct)
+        
         pg.display.update()
         tmr += 1
         clock.tick(50)
