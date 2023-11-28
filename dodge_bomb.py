@@ -18,7 +18,7 @@ def main():
     bb_rct = bb_img.get_rect()  #練習２：爆弾SurfaceのRentを抽出する
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
-    screen.blit(bb_img, bb_rct)
+    vx, vy = +5, +5  # 練習２：爆弾の速度
 
     clock = pg.time.Clock()
     tmr = 0
@@ -32,7 +32,7 @@ def main():
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
-        clock.tick(10)
+        clock.tick(50)
 
 if __name__ == "__main__":
     pg.init()
