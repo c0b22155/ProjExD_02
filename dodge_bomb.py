@@ -32,7 +32,7 @@ def idou():
     """
     kk_img0 = pg.transform.rotozoom(pg.image.load("ex02/fig/3.png"), 0, 2.0)
     kk_img = pg.transform.flip(kk_img0, True, False)  #追加機能1：飛ぶ方向に従ってこうかとん画像を切り替える
-    return{ 
+    return{  
     (0, 0):kk_img,  
     (0, +5):pg.transform.rotozoom(kk_img, -90, 1.0),
     (+5, 0):kk_img, 
@@ -58,14 +58,22 @@ def main():
     bb_rct = bb_img.get_rect()  #練習２：爆弾SurfaceのRentを抽出する
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
+    saccs = [a for a in range(1, 11)]  # 追加機能2:加速度のリスト
+    c_acc = 0  # 追加機能2:現在の加速度
     vx, vy = +5, +5  # 練習２：爆弾の速度
     clock = pg.time.Clock()
     tmr = 0
     
     for r in range(1, 11):
         bb_img.set_colorkey((0, 0, 0))  # 黒い部分を透明に
+    while True:
+        if tmr % 100 == 0 and c_acc < len(saccs): # 追加機能2:爆弾を加速させる
+           acceleration = saccs[c_acc]
+           vx *= acceleration
+           vy *= acceleration
+           c_acc += 1      
 
-    while True:  
+        screen.blit(bb_img, bb_rct)
         
         for event in pg.event.get():
             if event.type == pg.QUIT:  #×ボタンを押すと..
@@ -84,7 +92,7 @@ def main():
                 
         screen.blit(bg_img, [0, 0])    
             
-        kk_rct.move_ip(sum_mv[0], sum_mv[1]) #  追加機能1：移動の合計値で画像を切り替え
+        kk_rct.move_ip(sum_mv[0], sum_mv[1]) #  追加機能1
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         kk_img = kk_imgs[tuple(sum_mv)]
