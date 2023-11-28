@@ -121,7 +121,6 @@ def main():
             bb_rct.x += direction.x
             bb_rct.y += direction.y
             
-            
         sum_mv = [0, 0]
         
         for k, tpl in delta.items():
