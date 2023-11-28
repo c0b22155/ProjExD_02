@@ -58,15 +58,27 @@ def main():
     bb_rct = bb_img.get_rect()  #練習２：爆弾SurfaceのRentを抽出する
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
-    
+    saccs = [a for a in range(1, 11)]  # 追加機能2:加速度のリスト
+    c_acc = 0  # 追加機能2:現在の加速度
     vx, vy = +5, +5  # 練習２：爆弾の速度
     clock = pg.time.Clock()
     tmr = 0
     
+    bb_imgs = []  ## 追加機能3:爆弾Surfaceのリストの作成
     for r in range(1, 11):
+        bb_img = pg.Surface((20 * r, 20 * r))  #　追加機能3:爆弾を大きくする
         bb_img.set_colorkey((0, 0, 0))  # 黒い部分を透明に
-        
-    while True: 
+        pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)#　追加機能3:爆弾を大きくする
+        bb_imgs.append(bb_img)
+    while True:
+        if tmr % 100 == 0 and c_acc < len(saccs): # 追加機能2:爆弾を加速させる
+           acceleration = saccs[c_acc]
+           vx *= acceleration
+           vy *= acceleration
+           c_acc += 1      
+           
+        selected_index = min(tmr // 500, 9)  # tmrに応じたリストの選択
+        bb_img = bb_imgs[selected_index]  # 選択された爆弾Surface  
         screen.blit(bb_img, bb_rct)
         
         for event in pg.event.get():
