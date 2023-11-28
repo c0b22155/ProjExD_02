@@ -51,6 +51,10 @@ def main():
             if event.type == pg.QUIT:  #×ボタンを押すと..
                 return
             
+        if kk_rct.colliderect(bb_rct):
+            print("Game Over")
+            return
+            
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         for k, tpl in delta.items():
