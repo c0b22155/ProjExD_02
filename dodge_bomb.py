@@ -13,6 +13,7 @@ delta = {  # 練習３：押下キーと移動量の辞書
     pg.K_RIGHT: (+5, 0)
 }
 
+
 def check_bound(rct):
     """
     オブジェクトが画面内or画面外を判定し，真理値タプルを返す関数
@@ -26,12 +27,13 @@ def check_bound(rct):
         tate = False
     return yoko, tate
 
+
 def idou():
     """
     移動の合計値をsum_mvに返す。キー入力した方向にこうかとんの画像が切り替わる。
     """
     kk_img0 = pg.transform.rotozoom(pg.image.load("ex02/fig/3.png"), 0, 2.0)
-    kk_img = pg.transform.flip(kk_img0, True, False)  #追加機能1：飛ぶ方向に従ってこうかとん画像を切り替える(左の画像に)
+    kk_img = pg.transform.flip(kk_img0, True, False)  #追加機能1：飛ぶ方向に従ってこうかとん画像を切り替える
     return{  
     (0, 0):kk_img,  
     (0, +5):pg.transform.rotozoom(kk_img, -90, 1.0),
@@ -43,6 +45,7 @@ def idou():
     (-5, -5):pg.transform.rotozoom(kk_img0, -45, 1.0),
     (+5, +5):pg.transform.rotozoom(kk_img, -45, 1.0),
 }
+    
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -58,9 +61,11 @@ def main():
     bb_rct = bb_img.get_rect()  #練習２：爆弾SurfaceのRentを抽出する
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
+    
     saccs = [a for a in range(1, 11)]  # 追加機能2:加速度のリスト
     c_acc = 0  # 追加機能2:現在の加速度
     vx, vy = +5, +5  # 練習２：爆弾の速度
+    
     clock = pg.time.Clock()
     tmr = 0
     
@@ -78,7 +83,7 @@ def main():
            c_acc += 1      
            
         selected_index = min(tmr // 500, 9)  # tmrに応じたリストの選択
-        bb_img = bb_imgs[selected_index]  # 選択された爆弾Surface  
+        bb_img = bb_imgs[selected_index]  # 追加機能3:選択された爆弾Surface  
         screen.blit(bb_img, bb_rct)
         
         for event in pg.event.get():
@@ -98,19 +103,32 @@ def main():
                 
         screen.blit(bg_img, [0, 0])    
             
-        kk_rct.move_ip(sum_mv[0], sum_mv[1])
+        kk_rct.move_ip(sum_mv[0], sum_mv[1]) #  追加機能1
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         kk_img = kk_imgs[tuple(sum_mv)]
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)  # 練習２：爆弾を移動させる
         
+        direction = pg.Vector2(kk_rct.center) - pg.Vector2(bb_rct.center) # 追加機能4:kk_rctとbb_rctの中心座標を比較し、爆弾をこうかとんに向かって移動させる
+        distance = direction.length()
+        
+        if distance < 500:
+            direction.normalize_ip()
+            bb_rct.x += direction.x * 2 * c_acc  # 追加機能4:移動速度を調整
+            bb_rct.y += direction.y * 2 * c_acc
+        else:
+            direction.scale_to_length((distance-500) / 10)
+            bb_rct.x += direction.x
+            bb_rct.y += direction.y
+            
+            
         sum_mv = [0, 0]
         
         for k, tpl in delta.items():
             if key_lst[k]:  
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
+                
         yoko, tate = check_bound(bb_rct)
         if not yoko:  # 横方向にはみ出たら
             vx *= -1
@@ -120,6 +138,7 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
+
 
 if __name__ == "__main__" :
     pg.init()
